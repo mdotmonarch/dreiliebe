@@ -113,7 +113,7 @@ function Camera:draw(trientity, drawMesh, drawWireframe, drawVertices)
 	for i, triangle in pairs(trientity.face_list) do
 		if drawMesh then
 			for j = 1, 3 do
-				trientity.mesh:setVertex((3*(i-1))+j, {pr_v_l[triangle[j]][1], pr_v_l[triangle[j]][2], pr_v_l[triangle[j]][3], 0.3+0.01*i, 0.3+0.01*i, 0.3+0.01*i, 1})
+				trientity.mesh:setVertex((3*(i-1))+j, {pr_v_l[triangle[j]][1], pr_v_l[triangle[j]][2], pr_v_l[triangle[j]][3], 0.3+(i*0.01), 0.3+(i*0.01), 0.3+(i*0.01), 1})
 			end
 		end
 

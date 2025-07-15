@@ -15,6 +15,7 @@ love.graphics.setDepthMode("lequal", true)
 
 local dlb = {}
 
+dlb.Loader = require("dlb/loader")
 dlb.Vector = require("dlb/vector")
 dlb.Entity = require("dlb/entity")
 dlb.TriEntity = require("dlb/trientity")

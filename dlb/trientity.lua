@@ -7,13 +7,13 @@ local Vector = require("dlb/vector")
 local TriEntity = {}
 
 -- Constructor
-function TriEntity:new(v_l, t_l, scale, x, y, z, phi, theta, psi)
+function TriEntity:new(geometry, scale, x, y, z, phi, theta, psi)
 	local attributes = Entity:new(scale, x, y, z, phi, theta, psi)
 	attributes.type = "triEntity"
-	attributes.vertex_list = v_l
-	attributes.face_list = t_l
+	attributes.vertex_list = geometry.vertices
+	attributes.face_list = geometry.faces
 	local mesh_table = {}
-	for _, f in pairs(t_l) do
+	for _, f in pairs(geometry.faces) do
 		for i = 1,3 do
 			table.insert(mesh_table, {0, 0, 0, 1, 1, 1, 1})
 		end
