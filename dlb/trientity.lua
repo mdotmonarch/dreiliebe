@@ -7,21 +7,33 @@ local Vector = require("dlb/vector")
 local TriEntity = {}
 
 -- Constructor
-function TriEntity:new(geometry, scale, x, y, z, phi, theta, psi)
-	local attributes = Entity:new(scale, x, y, z, phi, theta, psi)
+function TriEntity:new(args)
+	--[[
+	args format : {
+		geometry: geometry
+		scale: number
+		position: vector4
+		orientation: vector3
+	}
+	]]--
+	local attributes = Entity:new({
+		scale = args.scale,
+		position = args.position,
+		orientation = args.orientation
+	})
 	attributes.type = "triEntity"
-	attributes.vertex_list = geometry.vertices
-	attributes.face_list = geometry.faces
+	attributes.vertices = args.geometry.vertices
+	attributes.faces = args.geometry.faces
 	local mesh_table = {}
-	for _, f in pairs(geometry.faces) do
+	for _, f in pairs(args.geometry.faces) do
 		for i = 1,3 do
-			table.insert(mesh_table, {0, 0, 0, 1, 1, 1, 1})
+			table.insert(mesh_table, {})
 		end
 	end
 	attributes.mesh = love.graphics.newMesh({
-	{"VertexPosition", "float", 3},
-	{"VertexColor", "byte", 4}
-	}, mesh_table, "triangles", "dynamic")
+		{"VertexPosition", "float", 3},
+		{"VertexColor", "byte", 4}
+	}, mesh_table, "triangles")
 	self.__index = self
 	self.__tostring = function(self) return string.format("%s (scale: %s, position: %s, orientation: %s)", self.type, self.scale, self.position, self.orientation) end
 	return setmetatable(attributes, self)

@@ -1,3 +1,6 @@
+-- dreiliebe - vector file
+-- author: max@mdotmonar.ch
+
 local Vector = {}
 
 -- Constructor
@@ -6,7 +9,7 @@ function Vector:new(arg)
 	if type(arg) == "number" then
 		attributes = {}
 		for i=1,arg do
-			attributes[#attributes+1] = 0
+			table.insert(attributes, 0)
 		end
 	elseif type(arg) == "table" then
 		attributes = arg
@@ -34,7 +37,7 @@ end
 Vector.__unm = function(v)
 	local n_v = {}
 	for i=1,#v do
-		n_v[#n_v+1] = -1*v[i]
+		table.insert(n_v, -1*v[i])
 	end
 	return Vector:new(n_v)
 end
@@ -42,7 +45,7 @@ end
 Vector.__add = function(v1, v2)
 	local n_v = {}
 	for i=1,#v1 do
-		n_v[#n_v+1] = v1[i]+v2[i]
+		table.insert(n_v, v1[i]+v2[i])
 	end
 	return Vector:new(n_v)
 end
@@ -50,7 +53,7 @@ end
 Vector.__sub = function(v1, v2)
 	local n_v = {}
 	for i=1,#v1 do
-		n_v[#n_v+1] = v1[i]-v2[i]
+		table.insert(n_v, v1[i]-v2[i])
 	end
 	return Vector:new(n_v)
 end
@@ -65,13 +68,13 @@ function Vector.__mul(v1, v2)
 	elseif type(v1) == "number" and type(v2) == "vector" then
 		local n_v = {}
 		for i=1,#v2 do
-			n_v[#n_v+1] = v1*v2[i]
+			table.insert(n_v, v1*v2[i])
 		end
 		return Vector:new(n_v)
 	elseif type(v1) == "vector" and type(v2) == "number" then
 		local n_v = {}
 		for i=1,#v1 do
-			n_v[#n_v+1] = v2*v1[i]
+			table.insert(n_v, v2*v1[i])
 		end
 		return Vector:new(n_v)
 	end
