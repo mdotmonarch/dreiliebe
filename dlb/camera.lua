@@ -4,13 +4,28 @@ local Entity = require("dlb/entity")
 local Camera = {}
 
 -- Constructor
-function Camera:new(projection, scale, x, y, z, phi, theta, psi)
-	local attributes = Entity:new(scale, x, y, z, phi, theta, psi)
+function Camera:new(args)
+	--[[
+	args format : {
+		projection: string
+		fov: number
+		near: 0.01
+		far: 0.01
+		scale: number
+		position: vector4
+		orientation: vector3
+	}
+	]]--
+	local attributes = Entity:new({
+		scale = args.scale,
+		position = args.position,
+		orientation = args.orientation
+	})
 	attributes.type = "camera"
-	attributes.projection = projection
-	attributes.fov = math.pi/2
-	attributes.near = 0.01
-	attributes.far = 1000
+	attributes.projection = args.projection
+	attributes.fov = args.fov
+	attributes.near = args.near
+	attributes.far = args.far
 	self.__index = self
 	self.__tostring = function(self) return string.format("%s (scale: %s, position: %s, orientation: %s)", self.type, self.scale, self.position, self.orientation) end
 	return setmetatable(attributes, self)
@@ -82,49 +97,58 @@ function Camera:Po(v)
 	})
 end
 
-function Camera:draw(trientity, drawMesh, drawWireframe, drawVertices)
+function Camera:draw(args)
+	--[[
+	args format : {
+		drawable: triEntity
+		drawMesh: boolean
+		drawWireframe: boolean
+		drawVertices: boolean
+	}
+	]]--
+
 	-- apply local space transformations (scale, x-axis rotation, y-axis rotation, z-axis rotation, translation)
-	ls_v_l = {}
-	for _, point in pairs(trientity.vertex_list) do
-		table.insert(ls_v_l,
+	ls_vertices = {}
+	for _, vertex in pairs(args.drawable.vertices) do
+		table.insert(ls_vertices,
 			self:Tr(
 			self:Rz(
 			self:Ry(
 			self:Rx(
 			self:Sc(
-				point,
-			trientity.scale),
-			trientity.orientation),
-			trientity.orientation),
-			trientity.orientation),
-			trientity.position)
+				vertex,
+			args.drawable.scale),
+			args.drawable.orientation),
+			args.drawable.orientation),
+			args.drawable.orientation),
+			args.drawable.position)
 		)
 	end
 
 	-- TO-DO: apply camera transformation
 
 	-- apply projection
-	pr_v_l = {}
-	for _, point in pairs(ls_v_l) do
-		table.insert(pr_v_l, self:Po(point))
+	pr_vertices = {}
+	for _, vertex in pairs(ls_vertices) do
+		table.insert(pr_vertices, self:Po(vertex))
 	end
 
 	-- draw triangles
-	for i, triangle in pairs(trientity.face_list) do
-		if drawMesh then
+	for i, triangle in pairs(args.drawable.faces) do
+		if args.drawMesh then
 			for j = 1, 3 do
-				trientity.mesh:setVertex((3*(i-1))+j, {pr_v_l[triangle[j]][1], pr_v_l[triangle[j]][2], pr_v_l[triangle[j]][3], 0.3+(i*0.01), 0.3+(i*0.01), 0.3+(i*0.01), 1})
+				args.drawable.mesh:setVertex((3*(i-1))+j, {pr_vertices[triangle[j]][1], pr_vertices[triangle[j]][2], pr_vertices[triangle[j]][3], 0.3+(i*0.01), 0.3+(i*0.01), 0.3+(i*0.01), 1})
 			end
 		end
 
-		if drawWireframe then
+		if args.drawWireframe then
 			t = {
-				pr_v_l[triangle[1]][1],
-				pr_v_l[triangle[1]][2],
-				pr_v_l[triangle[2]][1],
-				pr_v_l[triangle[2]][2],
-				pr_v_l[triangle[3]][1],
-				pr_v_l[triangle[3]][2],
+				pr_vertices[triangle[1]][1],
+				pr_vertices[triangle[1]][2],
+				pr_vertices[triangle[2]][1],
+				pr_vertices[triangle[2]][2],
+				pr_vertices[triangle[3]][1],
+				pr_vertices[triangle[3]][2],
 			}
 			love.graphics.setColor(0, 1, 0)
 			love.graphics.polygon("line", t)
@@ -133,15 +157,15 @@ function Camera:draw(trientity, drawMesh, drawWireframe, drawVertices)
 	end
 
 	-- draw mesh
-	if drawMesh then
-		love.graphics.draw(trientity.mesh)
+	if args.drawMesh then
+		love.graphics.draw(args.drawable.mesh)
 	end
 
 	-- draw vertices
-	if drawVertices then
+	if args.drawVertices then
 		love.graphics.setColor(1, 1, 0)
-		for _, point in pairs(pr_v_l) do
-			love.graphics.circle("fill", point[1], point[2], 3)
+		for _, vertex in pairs(pr_vertices) do
+			love.graphics.circle("fill", vertex[1], vertex[2], 3)
 		end
 		love.graphics.setColor(1, 1, 1)
 	end
