@@ -1,3 +1,6 @@
+-- dreiliebe - vector file
+-- author: max@mdotmonar.ch
+
 local Vector = {}
 
 -- Constructor

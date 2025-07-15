@@ -1,3 +1,6 @@
+-- dreiliebe - entity file
+-- author: max@mdotmonar.ch
+
 local Vector = require("dlb/vector")
 
 local Entity = {}
