@@ -10,13 +10,13 @@ local Camera = {}
 function Camera:new(args)
 	--[[
 	args format : {
-		projection: string
-		fov: number
-		near: number
-		far: number
-		scale: number
-		position: vector4
-		orientation: vector3
+		projection: string (default "orthographic")
+		fov: number (default math.pi/2)
+		near: number (default 0.01)
+		far: number (default 1000)
+		scale: number (default 1)
+		position: vector4 (default {0, 0, 0, 1})
+		orientation: vector3 (default {0, 0, 0})
 	}
 	]]--
 	local attributes = Entity:new({
@@ -24,11 +24,11 @@ function Camera:new(args)
 		position = args.position,
 		orientation = args.orientation
 	})
+	attributes.projection = args.projection or "orthographic"
+	attributes.fov = args.fov or math.pi/2
+	attributes.near = args.near or 0.01
+	attributes.far = args.far or 1000
 	attributes.type = "camera"
-	attributes.projection = args.projection
-	attributes.fov = args.fov
-	attributes.near = args.near
-	attributes.far = args.far
 	self.__index = self
 	self.__tostring = function(self) return string.format("%s (scale: %s, position: %s, orientation: %s)", self.type, self.scale, self.position, self.orientation) end
 	return setmetatable(attributes, self)
@@ -151,16 +151,20 @@ end
 function Camera:draw(args)
 	--[[
 	args format : {
-		drawable: triEntity
-		drawMesh: boolean
-		drawWireframe: boolean
-		drawVertices: boolean
+		drawable: triEntity (required)
+		drawMesh: boolean (default true)
+		drawWireframe: boolean (default false)
+		drawVertices: boolean (default false)
 	}
 	]]--
 
+	local drawMesh = args.drawMesh ~= false
+	local drawWireframe = args.drawWireframe
+	local drawVertices = args.drawVertices
+
 	-- apply local space transformations (scale, x-axis rotation, y-axis rotation, z-axis rotation, translation)
 	ls_vertices = {}
-	for _, vertex in pairs(args.drawable.vertices) do
+	for _, vertex in pairs(args.drawable.geometry.vertices) do
 		table.insert(ls_vertices,
 			self:Tr(
 			self:Rz(
@@ -185,14 +189,14 @@ function Camera:draw(args)
 	end
 
 	-- draw triangles
-	for i, triangle in pairs(args.drawable.faces) do
-		if args.drawMesh then
+	for i, triangle in pairs(args.drawable.geometry.faces) do
+		if drawMesh then
 			for j = 1, 3 do
 				args.drawable.mesh:setVertex((3*(i-1))+j, {pr_vertices[triangle[j]][1], pr_vertices[triangle[j]][2], pr_vertices[triangle[j]][3], 0.3+(i*0.01), 0.3+(i*0.01), 0.3+(i*0.01), 1})
 			end
 		end
 
-		if args.drawWireframe then
+		if drawWireframe then
 			t = {
 				pr_vertices[triangle[1]][1],
 				pr_vertices[triangle[1]][2],
@@ -208,12 +212,12 @@ function Camera:draw(args)
 	end
 
 	-- draw mesh
-	if args.drawMesh then
+	if drawMesh then
 		love.graphics.draw(args.drawable.mesh)
 	end
 
 	-- draw vertices
-	if args.drawVertices then
+	if drawVertices then
 		love.graphics.setColor(1, 1, 0)
 		for _, vertex in pairs(pr_vertices) do
 			love.graphics.circle("fill", vertex[1], vertex[2], 3)

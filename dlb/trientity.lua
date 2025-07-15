@@ -10,10 +10,10 @@ local TriEntity = {}
 function TriEntity:new(args)
 	--[[
 	args format : {
-		geometry: geometry
-		scale: number
-		position: vector4
-		orientation: vector3
+		geometry: geometry (required)
+		scale: number (default 1)
+		position: vector4 (default {0, 0, 0, 1})
+		orientation: vector3 (default {0, 0, 0})
 	}
 	]]--
 	local attributes = Entity:new({
@@ -22,8 +22,7 @@ function TriEntity:new(args)
 		orientation = args.orientation
 	})
 	attributes.type = "triEntity"
-	attributes.vertices = args.geometry.vertices
-	attributes.faces = args.geometry.faces
+	attributes.geometry = args.geometry
 	local mesh_table = {}
 	for _, f in pairs(args.geometry.faces) do
 		for i = 1,3 do
