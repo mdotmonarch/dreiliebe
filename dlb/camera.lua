@@ -188,22 +188,30 @@ function Camera:draw(args)
 		table.insert(pr_vertices, self:Po(vertex))
 	end
 
-	-- draw triangles
-	for i, triangle in pairs(args.drawable.geometry.faces) do
+	-- draw faces
+	for i, face in pairs(args.drawable.geometry.faces) do
+		local v_i = face.vertex_indices
+		local vt_i = face.texture_coordinate_indices
+		local n_i = face.normal_indices
+
 		if drawMesh then
 			for j = 1, 3 do
-				args.drawable.mesh:setVertex((3*(i-1))+j, {pr_vertices[triangle[j]][1], pr_vertices[triangle[j]][2], pr_vertices[triangle[j]][3], 0.3+(i*0.01), 0.3+(i*0.01), 0.3+(i*0.01), 1})
+				args.drawable.mesh:setVertex((3*(i-1))+j, {
+					pr_vertices[v_i[j]][1], pr_vertices[v_i[j]][2], pr_vertices[v_i[j]][3],
+					args.drawable.geometry.texture_coordinates[vt_i[j]][1], args.drawable.geometry.texture_coordinates[vt_i[j]][2],
+					1, 1, 1, 1
+				})
 			end
 		end
 
 		if drawWireframe then
 			t = {
-				pr_vertices[triangle[1]][1],
-				pr_vertices[triangle[1]][2],
-				pr_vertices[triangle[2]][1],
-				pr_vertices[triangle[2]][2],
-				pr_vertices[triangle[3]][1],
-				pr_vertices[triangle[3]][2],
+				pr_vertices[v_i[1]][1],
+				pr_vertices[v_i[1]][2],
+				pr_vertices[v_i[2]][1],
+				pr_vertices[v_i[2]][2],
+				pr_vertices[v_i[3]][1],
+				pr_vertices[v_i[3]][2],
 			}
 			love.graphics.setColor(0, 1, 0)
 			love.graphics.polygon("line", t)
