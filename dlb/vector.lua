@@ -5,18 +5,26 @@ local Vector = {}
 
 -- Constructor
 function Vector:new(arg)
-	local attributes
-	if type(arg) == "number" then
-		attributes = {}
-		for i=1,arg do
-			table.insert(attributes, 0)
-		end
-	elseif type(arg) == "table" then
-		attributes = arg
-	end
+	local attributes = arg
 	attributes.type = "vector"
 	self.__index = self
 	return setmetatable(attributes, self)
+end
+
+function Vector:zeros(n)
+	attributes = {}
+	for i=1,n do
+		table.insert(attributes, 0)
+	end
+	return Vector:new(attributes)
+end
+
+function Vector:ones(n)
+	attributes = {}
+	for i=1,n do
+		table.insert(attributes, 1)
+	end
+	return Vector:new(attributes)
 end
 
 -- tostring
